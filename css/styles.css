@@ -332,7 +332,7 @@ body {
 
 #map-container {
     position: relative;
-    background: var(--color-bg);
+    background: #c7e3f5;
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg);
     margin-bottom: var(--spacing-lg);
@@ -629,6 +629,9 @@ body {
     box-shadow: var(--shadow-lg);
     position: relative;
     animation: slideUp var(--transition-normal);
+    padding: var(--spacing-lg);
+    overflow-wrap: break-word;
+    box-sizing: border-box;
 }
 
 @keyframes slideUp {
