@@ -409,7 +409,15 @@ function showTooltip(event, countyData) {
 /**
  * Move tooltip with cursor
  */
+let lastTooltipMove = 0;
+
 function moveTooltip(event) {
+    const now = Date.now();
+    if (now - lastTooltipMove < 16) {
+        return;
+    }
+    lastTooltipMove = now;
+    
     const tooltip = d3.select('#tooltip');
     tooltip
         .style('left', (event.pageX + 15) + 'px')
