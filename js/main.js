@@ -413,7 +413,7 @@ let lastTooltipMove = 0;
 
 function moveTooltip(event) {
     const now = Date.now();
-    if (now - lastTooltipMove < 16) {
+    if (now - lastTooltipMove < 32) {
         return;
     }
     lastTooltipMove = now;
