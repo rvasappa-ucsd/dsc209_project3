@@ -412,9 +412,6 @@ function showTooltip(event, countyData) {
 let lastTooltipMove = 0;
 
 function moveTooltip(event) {
-    const tooltip = d3.select('#tooltip');
-    if (tooltip.style('opacity') === '0') return;
-    
     const now = Date.now();
     if (now - lastTooltipMove < 32) {
         return;
