@@ -12,6 +12,8 @@
 
 This visualization explores the relationship between economic factors and health outcomes across 3,068 U.S. counties. Rather than simply showing the well-known correlation between wealth and health, we use machine learning to identify the **exceptions to this rule**—counties that defy economic predictions and achieve better or worse health outcomes than expected.
 
+While income is typically a strong predictor of health, some communities outperform expectations. Our project highlights those places to encourage learning from their resilience rather than only mapping deficit. This visualization makes economic inequality visible, but also spotlights hope in counties achieving longer lives despite limited resources. It is designed for readers interested in health equity (such as public health students, policy analysts, and members of the public) who want to explore patterns beyond surface-level averages.
+
 ## Live Visualization
 
 **GitHub Pages:** [https://rvasappa-ucsd.github.io/dsc209_project3/](https://rvasappa-ucsd.github.io/dsc209_project3/)
@@ -118,6 +120,12 @@ We tested multiple ColorBrewer palettes:
 - **Card-based layout:** Modular design with clear visual hierarchy
 - **Responsive grid:** Adapts to mobile, tablet, and desktop screens
 - **High contrast ratios:** Meets WCAG AA accessibility standards
+
+---
+
+## Exploratory Data Analysis
+
+Before creating the interactive visualization, we explored the dataset to understand which factors most strongly influenced life expectancy and how they interacted geographically. Correlation and scatterplot analysis confirmed that income and education were the most predictive variables (r ≈ 0.7). These insights guided our modeling and visualization choices. 
 
 ---
 
