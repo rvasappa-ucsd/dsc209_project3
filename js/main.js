@@ -465,13 +465,13 @@ function showCountyModal(countyData) {
     predictionBar.innerHTML = `
         <div style="position: relative; width: 100%; height: 60px;">
             <div style="position: absolute; left: 0; top: 0; width: 100%; height: 30px; background: #e5e7eb; border-radius: 15px; overflow: hidden;">
-                <div class="prediction-bar-fill predicted" style="width: 0%; height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); position: relative; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);" data-width="${predictedPercent}%">
-                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85rem;">Predicted</span>
+                <div class="prediction-bar-fill predicted" style="width: 5%; height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); position: relative; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);" data-width="${predictedPercent}%">
+                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">Predicted</span>
                 </div>
             </div>
             <div style="position: absolute; left: 0; top: 35px; width: 100%; height: 30px; background: #e5e7eb; border-radius: 15px; overflow: hidden;">
-                <div class="prediction-bar-fill actual" style="width: 0%; height: 100%; background: ${residual > 0 ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, #ef4444, #dc2626)'}; position: relative; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);" data-width="${actualPercent}%">
-                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85rem;">Actual</span>
+                <div class="prediction-bar-fill actual" style="width: 5%; height: 100%; background: ${residual > 0 ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, #ef4444, #dc2626)'}; position: relative; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);" data-width="${actualPercent}%">
+                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">Actual</span>
                 </div>
             </div>
         </div>
