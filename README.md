@@ -201,24 +201,6 @@ Before creating the interactive visualization, we explored the dataset to unders
 
 **Total Effort:** ~70 person-hours over 2.5 weeks
 
-### Development Timeline
-
-**Week 1 (Nov 4-10):**
-- Dataset acquisition and exploratory analysis
-- Checkpoint submission with 6 exploratory graphs
-- Team decision on deviation map approach
-- Initial data processing script
-
-**Week 2 (Nov 11-17):**
-- Days 1-3: Data pipeline, ML model training, JSON export
-- Days 4-6: D3.js core implementation (map rendering, color scales, basic interactions)
-- Days 7-9: UI polish (modals, legends, filters), CSS refinement, cross-browser testing
-
-**Week 3 (Nov 18-20):**
-- Final testing and bug fixes
-- Write-up and documentation
-- GitHub Pages deployment
-
 ### Technical Challenges
 
 **1. Data Wrangling (~25% of total time)**
