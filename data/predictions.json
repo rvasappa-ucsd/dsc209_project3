@@ -1,0 +1,71 @@
+{
+  "model": "Random Forest Regressor",
+  "target_variable": "life_expectancy",
+  "predictor_features": [
+    "median_income",
+    "high_school_grad",
+    "uninsured_rate",
+    "adult_obesity",
+    "adult_smoking",
+    "physical_inactivity",
+    "diabetes_prevalence",
+    "excessive_drinking",
+    "primary_care_rate"
+  ],
+  "r2_score": 0.7073781971222088,
+  "feature_importance": [
+    {
+      "feature": "median_income",
+      "importance": 0.5228250697446101,
+      "name": "Median Household Income"
+    },
+    {
+      "feature": "physical_inactivity",
+      "importance": 0.15391983146225668,
+      "name": "Physical Inactivity"
+    },
+    {
+      "feature": "adult_smoking",
+      "importance": 0.11046631703790603,
+      "name": "Adult Smoking"
+    },
+    {
+      "feature": "excessive_drinking",
+      "importance": 0.048439417452637294,
+      "name": "Excessive Drinking"
+    },
+    {
+      "feature": "adult_obesity",
+      "importance": 0.03819919527019275,
+      "name": "Adult Obesity"
+    },
+    {
+      "feature": "diabetes_prevalence",
+      "importance": 0.0361444358886042,
+      "name": "Diabetes Prevalence"
+    },
+    {
+      "feature": "uninsured_rate",
+      "importance": 0.035673453339338766,
+      "name": "Uninsured Rate"
+    },
+    {
+      "feature": "primary_care_rate",
+      "importance": 0.030095126238117942,
+      "name": "Primary Care Physician Rate"
+    },
+    {
+      "feature": "high_school_grad",
+      "importance": 0.02423715356633638,
+      "name": "High School Graduation"
+    }
+  ],
+  "statistics": {
+    "mean_residual": 0.03654636333727835,
+    "std_residual": 1.6389630968695552,
+    "min_residual": -13.962781247457059,
+    "max_residual": 12.159543857304286,
+    "overperforming_count": 738,
+    "underperforming_count": 685
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "life_expectancy": {
+    "name": "Life Expectancy",
+    "unit": "years",
+    "format": ".1f",
+    "description": "Average expected lifespan",
+    "category": "Health Outcomes"
+  },
+  "premature_death_rate": {
+    "name": "Premature Death Rate",
+    "unit": "per 100k",
+    "format": ".0f",
+    "description": "Years of potential life lost before age 75",
+    "category": "Health Outcomes"
+  },
+  "poor_fair_health": {
+    "name": "Poor/Fair Health",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Adults reporting poor or fair health",
+    "category": "Health Outcomes"
+  },
+  "median_income": {
+    "name": "Median Household Income",
+    "unit": "$",
+    "format": ",.0f",
+    "description": "Median household income",
+    "category": "Socioeconomic"
+  },
+  "high_school_grad": {
+    "name": "High School Graduation",
+    "unit": "%",
+    "format": ".1f",
+    "description": "High school graduation rate",
+    "category": "Socioeconomic"
+  },
+  "uninsured_rate": {
+    "name": "Uninsured Rate",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Population without health insurance",
+    "category": "Healthcare Access"
+  },
+  "adult_obesity": {
+    "name": "Adult Obesity",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Adults with BMI >= 30",
+    "category": "Health Behaviors"
+  },
+  "adult_smoking": {
+    "name": "Adult Smoking",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Adults who smoke",
+    "category": "Health Behaviors"
+  },
+  "physical_inactivity": {
+    "name": "Physical Inactivity",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Adults with no physical activity",
+    "category": "Health Behaviors"
+  },
+  "diabetes_prevalence": {
+    "name": "Diabetes Prevalence",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Adults with diabetes",
+    "category": "Health Behaviors"
+  },
+  "excessive_drinking": {
+    "name": "Excessive Drinking",
+    "unit": "%",
+    "format": ".1f",
+    "description": "Adults reporting binge/heavy drinking",
+    "category": "Health Behaviors"
+  },
+  "primary_care_rate": {
+    "name": "Primary Care Physician Rate",
+    "unit": "per 100k",
+    "format": ".0f",
+    "description": "Primary care physicians per 100,000 population",
+    "category": "Healthcare Access"
+  }
+}

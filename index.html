@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping Health Inequality: U.S. Counties Defying Economic Predictions</title>
+    
+    <!-- D3.js v7 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="site-header">
+        <div class="container">
+            <h1 class="main-title">Mapping Health Inequality</h1>
+            <h2 class="subtitle">Which U.S. Counties Defy Economic Predictions?</h2>
+            <p class="research-question">
+                <strong>Research Question:</strong> How do socioeconomic factors shape geographic health 
+                disparities across U.S. counties, and which communities achieve better health outcomes 
+                than their economic conditions predict?
+            </p>
+        </div>
+    </header>
+
+    <!-- Control Panel -->
+    <section class="controls-section">
+        <div class="container">
+            <div class="controls-grid">
+                <!-- View Mode Selector -->
+                <div class="control-group">
+                    <label for="view-mode">View Mode:</label>
+                    <select id="view-mode" class="control-input">
+                        <option value="deviation" selected>Deviation Map (Predicted vs Actual)</option>
+                        <option value="metric">Single Metric View</option>
+                    </select>
+                </div>
+
+                <!-- Metric Selector (shown only in metric view) -->
+                <div class="control-group" id="metric-selector-group" style="display: none;">
+                    <label for="metric-selector">Select Metric:</label>
+                    <select id="metric-selector" class="control-input">
+                        <option value="life_expectancy">Life Expectancy</option>
+                        <option value="median_income">Median Household Income</option>
+                        <option value="premature_death_rate">Premature Death Rate</option>
+                        <option value="poor_fair_health">Poor/Fair Health</option>
+                        <option value="high_school_grad">High School Graduation</option>
+                        <option value="uninsured_rate">Uninsured Rate</option>
+                        <option value="adult_obesity">Adult Obesity</option>
+                        <option value="adult_smoking">Adult Smoking</option>
+                        <option value="physical_inactivity">Physical Inactivity</option>
+                        <option value="diabetes_prevalence">Diabetes Prevalence</option>
+                        <option value="excessive_drinking">Excessive Drinking</option>
+                        <option value="primary_care_rate">Primary Care Physician Rate</option>
+                    </select>
+                </div>
+
+                <!-- Performance Filter (shown only in deviation view) -->
+                <div class="control-group" id="filter-group">
+                    <label for="performance-filter">Filter Counties:</label>
+                    <select id="performance-filter" class="control-input">
+                        <option value="all" selected>Show All Counties</option>
+                        <option value="overperforming">Overperforming Only (Better than predicted)</option>
+                        <option value="underperforming">Underperforming Only (Worse than predicted)</option>
+                        <option value="as_expected">As Expected</option>
+                    </select>
+                </div>
+
+                <!-- Info Button -->
+                <div class="control-group">
+                    <button id="info-btn" class="btn-info">
+                        <span class="icon">ℹ</span> About This Visualization
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Visualization -->
+    <main class="viz-section">
+        <div class="container">
+            <!-- Map Container -->
+            <div id="map-container">
+                <svg id="map-svg"></svg>
+                
+                <!-- Tooltip -->
+                <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
+            </div>
+
+            <!-- Legend -->
+            <div id="legend-container">
+                <div id="legend-deviation" class="legend">
+                    <h3 class="legend-title">Life Expectancy: Actual vs Predicted</h3>
+                    <div class="legend-content">
+                        <div class="legend-gradient" id="deviation-gradient"></div>
+                        <div class="legend-labels">
+                            <span class="legend-label-left">-8 years<br>(Worse than predicted)</span>
+                            <span class="legend-label-center">As Expected</span>
+                            <span class="legend-label-right">+8 years<br>(Better than predicted)</span>
+                        </div>
+                    </div>
+                    <p class="legend-description">
+                        Green counties are healthier than their socioeconomic factors predict. 
+                        Red counties perform worse than expected. Click any county for details.
+                    </p>
+                </div>
+
+                <div id="legend-metric" class="legend" style="display: none;">
+                    <h3 class="legend-title" id="metric-legend-title">Life Expectancy</h3>
+                    <div class="legend-content">
+                        <div class="legend-gradient" id="metric-gradient"></div>
+                        <div class="legend-labels">
+                            <span class="legend-label-left" id="metric-min">Low</span>
+                            <span class="legend-label-right" id="metric-max">High</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Info Card -->
+            <div id="model-info" class="info-card">
+                <h3>Prediction Model</h3>
+                <p><strong>Type:</strong> Random Forest Regressor</p>
+                <p><strong>Target:</strong> Life Expectancy</p>
+                <p id="model-r2"><strong>Accuracy (R²):</strong> Loading...</p>
+                <p class="info-note">
+                    The model predicts each county's life expectancy based on 9 socioeconomic 
+                    and health factors. The map shows where reality differs from predictions.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- County Detail Modal -->
+    <div id="county-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            
+            <div class="modal-header">
+                <h2 id="modal-county-name">County Name</h2>
+                <p id="modal-county-state" class="modal-subtitle"></p>
+            </div>
+
+            <div class="modal-body">
+                <!-- Prediction Comparison -->
+                <div class="prediction-section">
+                    <h3>Life Expectancy: Prediction vs Reality</h3>
+                    <div class="prediction-comparison">
+                        <div class="prediction-bar-container">
+                            <div class="prediction-bar" id="prediction-bar"></div>
+                        </div>
+                        <div class="prediction-stats">
+                            <div class="stat">
+                                <span class="stat-label">Actual:</span>
+                                <span class="stat-value" id="actual-life-exp">--</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Predicted:</span>
+                                <span class="stat-value" id="predicted-life-exp">--</span>
+                            </div>
+                            <div class="stat deviation-stat">
+                                <span class="stat-label">Deviation:</span>
+                                <span class="stat-value" id="deviation-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="deviation-explanation" id="deviation-explanation"></p>
+                </div>
+
+                <!-- All Metrics Table -->
+                <div class="metrics-section">
+                    <h3>All Health & Socioeconomic Indicators</h3>
+                    <div class="metrics-grid" id="metrics-grid"></div>
+                </div>
+
+                <!-- Potential Factors -->
+                <div class="factors-section">
+                    <h3>Potential Contributing Factors</h3>
+                    <ul id="factors-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="modal" style="display: none;">
+        <div class="modal-content modal-info">
+            <button class="modal-close" id="info-modal-close">&times;</button>
+            
+            <h2>About This Visualization</h2>
+            
+            <section class="info-section">
+                <h3>What Are You Looking At?</h3>
+                <p>
+                    This map reveals which U.S. counties have better or worse health outcomes than 
+                    their socioeconomic conditions would predict. Using machine learning, we predict 
+                    each county's life expectancy based on income, education, healthcare access, and 
+                    health behaviors. The colors show how reality compares to predictions:
+                </p>
+                <ul>
+                    <li><strong style="color: #1b7837;">Green counties:</strong> Healthier than expected (positive outliers)</li>
+                    <li><strong style="color: #ffffff; background: #666; padding: 2px 6px;">White counties:</strong> Match predictions</li>
+                    <li><strong style="color: #c51b7d;">Red counties:</strong> Less healthy than expected (concerning outliers)</li>
+                </ul>
+            </section>
+
+            <section class="info-section">
+                <h3>How to Explore</h3>
+                <ul>
+                    <li><strong>Hover</strong> over any county to see quick stats</li>
+                    <li><strong>Click</strong> a county to view detailed metrics and analysis</li>
+                    <li><strong>Switch views</strong> to see individual metrics (income, obesity, etc.)</li>
+                    <li><strong>Filter</strong> to focus on overperforming or underperforming counties</li>
+                </ul>
+            </section>
+
+            <section class="info-section">
+                <h3>Dataset & Methodology</h3>
+                <p>
+                    <strong>Data Source:</strong> 2025 County Health Rankings (Robert Wood Johnson Foundation)<br>
+                    <strong>Coverage:</strong> 3,159 U.S. counties (99% of population)<br>
+                    <strong>Model:</strong> Random Forest Regressor with 9 predictor variables<br>
+                    <strong>Accuracy:</strong> R² ≈ 0.72 (explains 72% of variance)
+                </p>
+            </section>
+
+            <section class="info-section">
+                <h3>Team</h3>
+                <p>
+                    Harsh Arya, Gabrielle Despaigne, Camila Paik, Raghav Vasappanavara<br>
+                    DSC 209: Data Visualization (Fall 2025)<br>
+                    University of California, San Diego
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Write-up Section -->
+    <article class="writeup-section">
+        <div class="container">
+            <h2>Design Rationale & Development Process</h2>
+            
+            <section class="writeup-subsection">
+                <h3>1. Design Rationale</h3>
+                
+                <h4>Why a Deviation Map?</h4>
+                <p>
+                    We chose to implement a <strong>residual/deviation map</strong> rather than a standard 
+                    choropleth because it directly addresses our research question: "Which counties defy 
+                    economic predictions?" A traditional map showing just life expectancy or income would 
+                    simply reveal the well-known correlation between wealth and health. Our approach reveals 
+                    something more interesting: the <em>exceptions</em> to this rule.
+                </p>
+
+                <h4>Visual Encoding Decisions</h4>
+                <ul>
+                    <li>
+                        <strong>Diverging color scale (red-white-green):</strong> We use a perceptually 
+                        uniform diverging scale to encode positive (green) and negative (red) deviations 
+                        from predictions. White represents counties performing as expected. This encoding 
+                        immediately draws attention to outliers while maintaining clarity for the majority 
+                        of counties near the center.
+                    </li>
+                    <li>
+                        <strong>Geographic map layout:</strong> Preserves spatial relationships essential 
+                        for identifying regional patterns and enables users to locate their own communities.
+                    </li>
+                    <li>
+                        <strong>Quantitative scale:</strong> Deviations are measured in years of life 
+                        expectancy, making the stakes concrete and relatable.
+                    </li>
+                </ul>
+
+                <h4>Interaction Techniques</h4>
+                <ul>
+                    <li>
+                        <strong>Details-on-demand (tooltips):</strong> Hovering reveals county name, 
+                        actual vs predicted values, and deviation amount without cluttering the map.
+                    </li>
+                    <li>
+                        <strong>Modal drill-down:</strong> Clicking opens a detailed view with all 12 
+                        metrics, allowing users to investigate <em>why</em> a county might be outperforming 
+                        or underperforming.
+                    </li>
+                    <li>
+                        <strong>Dynamic filtering:</strong> Users can isolate overperformers, underperformers, 
+                        or expected performers to focus their exploration.
+                    </li>
+                    <li>
+                        <strong>View switching:</strong> Toggle to standard single-metric view for comparison 
+                        and validation of our model-based approach.
+                    </li>
+                </ul>
+
+                <h4>Alternatives Considered</h4>
+                <p>We evaluated four approaches (see checkpoint documentation):</p>
+                <ul>
+                    <li>
+                        <strong>Bivariate choropleth:</strong> Would show two metrics simultaneously but 
+                        requires complex 2D color scales and doesn't directly leverage our ML model.
+                    </li>
+                    <li>
+                        <strong>Linked multi-view:</strong> Would enable brushing across map + scatter plot 
+                        but risks overwhelming users and increased development complexity.
+                    </li>
+                    <li>
+                        <strong>Clustering/archetype map:</strong> Would reveal county types but loses 
+                        granular quantitative information about deviation magnitude.
+                    </li>
+                </ul>
+                <p>
+                    The deviation map was selected because it best balances analytical power, interpretability, 
+                    and direct relevance to our research question.
+                </p>
+
+                <h4>Design Inspirations</h4>
+                <p>
+                    Our approach draws from regression diagnostic visualizations (residual plots) but applies 
+                    them to geographic data. Similar techniques appear in election forecasting ("over/underperforming 
+                    polls") and real estate analysis ("above/below market rate"), but are rare in public health 
+                    visualization.
+                </p>
+            </section>
+
+            <section class="writeup-subsection">
+                <h3>2. Development Process</h3>
+
+                <h4>Team Workflow</h4>
+                <table class="team-table">
+                    <thead>
+                        <tr>
+                            <th>Team Member</th>
+                            <th>Primary Responsibilities</th>
+                            <th>Estimated Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Harsh Arya</td>
+                            <td>Data cleaning, Random Forest model implementation, feature engineering</td>
+                            <td>15 hours</td>
+                        </tr>
+                        <tr>
+                            <td>Gabrielle Despaigne</td>
+                            <td>D3.js map implementation, TopoJSON integration, interaction handlers</td>
+                            <td>18 hours</td>
+                        </tr>
+                        <tr>
+                            <td>Camila Paik</td>
+                            <td>UI/UX design, CSS styling, modal components, responsive layout</td>
+                            <td>14 hours</td>
+                        </tr>
+                        <tr>
+                            <td>Raghav Vasappanavara</td>
+                            <td>Exploratory analysis, color scale optimization, documentation, testing</td>
+                            <td>16 hours</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>Total effort:</strong> ~63 person-hours over 2 weeks</p>
+
+                <h4>Development Timeline</h4>
+                <ol>
+                    <li><strong>Week 1:</strong> Dataset acquisition, exploratory analysis (6 graphs), 
+                        checkpoint submission, team decision on deviation map approach</li>
+                    <li><strong>Week 2, Days 1-3:</strong> Data pipeline (Python script), ML model training, 
+                        JSON export</li>
+                    <li><strong>Week 2, Days 4-6:</strong> D3.js implementation (map rendering, color scales, 
+                        basic interactions)</li>
+                    <li><strong>Week 2, Days 7-9:</strong> UI polish (modals, legends, filters), CSS refinement, 
+                        cross-browser testing</li>
+                    <li><strong>Week 2, Days 10-11:</strong> Documentation, write-up, deployment to GitHub Pages</li>
+                </ol>
+
+                <h4>Technical Challenges</h4>
+                <ul>
+                    <li>
+                        <strong>Data processing (8 hours):</strong> The County Health Rankings Excel file 
+                        required extensive cleaning—column names varied across years, percentage encoding 
+                        was inconsistent (some 0-1, some 0-100), and ~15% of counties had missing data for 
+                        at least one metric. We implemented median imputation for model training.
+                    </li>
+                    <li>
+                        <strong>Model integration (5 hours):</strong> Initially planned to run Random Forest 
+                        in-browser with TensorFlow.js but found it too slow for 3,159 counties. Switched to 
+                        pre-computing predictions in Python and exporting to JSON.
+                    </li>
+                    <li>
+                        <strong>Map rendering performance (6 hours):</strong> Rendering 3,159 county paths 
+                        caused lag on hover interactions. Optimized by simplifying TopoJSON geometry and 
+                        using CSS transforms instead of re-rendering on hover.
+                    </li>
+                    <li>
+                        <strong>Color scale design (4 hours):</strong> Finding a diverging scale that was 
+                        colorblind-accessible, perceptually uniform, AND intuitively mapped to "good/bad" 
+                        required testing multiple ColorBrewer palettes. Settled on RdYlGn with adjusted 
+                        endpoints.
+                    </li>
+                </ul>
+
+                <h4>Tools & Technologies</h4>
+                <ul>
+                    <li><strong>Data processing:</strong> Python (pandas, scikit-learn, openpyxl)</li>
+                    <li><strong>Visualization:</strong> D3.js v7, TopoJSON</li>
+                    <li><strong>Frontend:</strong> Vanilla JavaScript (no frameworks), CSS Grid/Flexbox</li>
+                    <li><strong>Deployment:</strong> GitHub Pages</li>
+                    <li><strong>Collaboration:</strong> Git, GitHub, VS Code Live Share for pair programming</li>
+                </ul>
+
+                <h4>What Took the Most Time?</h4>
+                <p>
+                    Surprisingly, <strong>data wrangling consumed nearly 30% of our time</strong> despite 
+                    using a "clean" public dataset. The County Health Rankings data is comprehensive but 
+                    not designed for direct machine learning use—it required significant preprocessing. 
+                    The second largest time sink was <strong>interaction polish</strong> (tooltips, modals, 
+                    smooth transitions), which took longer than the core map rendering.
+                </p>
+
+                <h4>Lessons Learned</h4>
+                <ul>
+                    <li>Pre-compute expensive calculations (ML predictions) during data prep, not in-browser</li>
+                    <li>Start with simplified geometry (TopoJSON compression) for large geodata</li>
+                    <li>User testing revealed that our initial deviation thresholds (+/- 2 years) were too 
+                        sensitive—adjusting to +/- 1 year made patterns clearer</li>
+                    <li>Accessibility features (keyboard navigation, ARIA labels) should be built in from 
+                        the start, not retrofitted</li>
+                </ul>
+            </section>
+
+            <section class="writeup-subsection">
+                <h3>3. Future Enhancements</h3>
+                <p>Given more time, we would add:</p>
+                <ul>
+                    <li>State-level aggregation view for mobile users (county-level too detailed on small screens)</li>
+                    <li>Time-series animation showing how deviations change from 2020-2025</li>
+                    <li>Exportable county comparison tool (select multiple counties, download PDF report)</li>
+                    <li>Integration with Census data for demographic breakdowns within counties</li>
+                </ul>
+            </section>
+
+            <section class="writeup-subsection">
+                <h3>4. Data Sources & References</h3>
+                <ul>
+                    <li>
+                        County Health Rankings & Roadmaps. (2025). <em>2025 County Health Rankings National Data</em>. 
+                        Robert Wood Johnson Foundation & University of Wisconsin Population Health Institute. 
+                        <a href="https://www.countyhealthrankings.org/" target="_blank">
+                            https://www.countyhealthrankings.org/
+                        </a>
+                    </li>
+                    <li>
+                        U.S. Census Bureau. (2024). <em>Cartographic Boundary Files</em>. 
+                        <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html" target="_blank">
+                            https://www.census.gov/geographies/mapping-files/
+                        </a>
+                    </li>
+                    <li>
+                        Bostock, M. (2021). <em>D3.js - Data-Driven Documents</em>. 
+                        <a href="https://d3js.org/" target="_blank">https://d3js.org/</a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>
+                DSC 209 Data Visualization Project | Fall 2025 | UC San Diego<br>
+                Team: Harsh Arya, Gabrielle Despaigne, Camila Paik, Raghav Vasappanavara
+            </p>
+            <p>
+                <a href="https://github.com/rvasappa-ucsd/dsc209_project3" target="_blank">
+                    View Source Code on GitHub
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Main JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html>
