@@ -1128,6 +1128,27 @@ body {
         font-size: 1rem;
     }
     
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: var(--spacing-md);
+    }
+    
+    .stat-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
     .controls-grid {
         grid-template-columns: 1fr;
     }
@@ -1171,6 +1192,27 @@ body {
         padding: var(--spacing-lg) var(--spacing-sm);
     }
     
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .stat-card {
+        padding: var(--spacing-md);
+    }
+    
+    .stat-icon {
+        font-size: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
     #map-svg {
         height: 400px;
     }
@@ -1179,6 +1221,11 @@ body {
         flex-direction: column;
         gap: var(--spacing-xs);
         text-align: center;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
     }
 }
 
