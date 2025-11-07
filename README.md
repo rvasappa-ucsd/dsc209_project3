@@ -306,7 +306,7 @@ Breaking down the timeline:
 
 **Development:**
 - Git for version control
-- VS Code with Live Server for local testing
+- Local HTTP server for testing
 - GitHub Pages for deployment
 
 **Testing:**
