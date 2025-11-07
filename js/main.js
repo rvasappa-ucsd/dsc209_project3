@@ -477,12 +477,15 @@ function showCountyModal(countyData) {
         </div>
     `;
     
-    // Animate bars
-    setTimeout(() => {
-        document.querySelectorAll('.prediction-bar-fill').forEach(bar => {
-            bar.style.width = bar.getAttribute('data-width');
+    // Animate bars using requestAnimationFrame for better reliability
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.prediction-bar-fill').forEach(bar => {
+                const targetWidth = bar.getAttribute('data-width');
+                bar.style.width = targetWidth;
+            });
         });
-    }, 100);
+    });
     
     // Explanation
     const explanation = document.getElementById('deviation-explanation');
@@ -550,13 +553,15 @@ function renderMetricsGrid(countyData) {
         }
     }
     
-    // Animate bars
-    setTimeout(() => {
-        document.querySelectorAll('.metric-bar').forEach(bar => {
-            const width = bar.getAttribute('data-width');
-            bar.style.width = width;
+    // Animate bars using requestAnimationFrame for better reliability
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.metric-bar').forEach(bar => {
+                const width = bar.getAttribute('data-width');
+                bar.style.width = width;
+            });
         });
-    }, 100);
+    });
 }
 
 /**
