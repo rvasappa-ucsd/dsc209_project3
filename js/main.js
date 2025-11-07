@@ -26,7 +26,7 @@ const config = {
     colorScales: {
         deviation: {
             domain: [-8, -4, 0, 4, 8],
-            range: ['#c51b7d', '#e9a3c9', '#ffe58f', '#a1d76a', '#1b7837']
+            range: ['#c51b7d', '#e9a3c9', '#fef3c7', '#a1d76a', '#1b7837']
         }
     },
     dataUrls: {
