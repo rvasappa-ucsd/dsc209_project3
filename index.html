@@ -22,6 +22,11 @@
                 <strong>Research Question:</strong> How do socioeconomic factors shape geographic health 
                 disparities across U.S. counties, and which communities achieve better health outcomes 
                 than their economic conditions predict?
+
+                <strong>Motivation:</strong> Economic inequality shapes life expectancy in measurable ways, but national averages hide local nuance. 
+                This project invites the public to explore which U.S. counties exceed or fall short of expectations and provide exploration of <i>why</i>. 
+                Designed for public health students, policy analysts, and curious citizens, this visualization transforms raw health data into a
+                story about resilience and disparity.
             </p>
         </div>
     </header>
@@ -157,6 +162,10 @@
                 <p class="info-note">
                     The model predicts each county's life expectancy based on 9 socioeconomic 
                     and health factors. The map shows where reality differs from predictions.
+                    <br>
+                    We chose a Random Forest because it captures nonlinear relationships without
+                    requiring feature scaling, making it easier to interpret differences in real 
+                    world terms (years of life expectancy).
                 </p>
             </div>
         </div>
@@ -350,6 +359,15 @@
                     them to geographic data. Similar techniques appear in election forecasting ("over/underperforming 
                     polls") and real estate analysis ("above/below market rate"), but are rare in public health 
                     visualization.
+                </p>
+
+                <h4>Interpretation and Ethical Considerations</h4>
+                <p>
+                    The labels “overperforming” and “underperforming” describe statistical deviation, not moral or cultural
+                    judgment. County level data can mask disparities within counties; a region that appears “healthy” overall 
+                    may still contain underserved communities. The visualization should therefore prompt inquiry, not outright ranking.
+                    The color scale communicates direction clearly but simplifies complex realities, so context from socioeconomic
+                    history remains essential for interpretation.
                 </p>
             </section>
 
