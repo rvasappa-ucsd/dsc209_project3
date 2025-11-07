@@ -255,16 +255,16 @@ function renderVisualization() {
             return countyData ? countyData.prediction.performance : 'unknown';
         })
         .on('mouseover', function(event, d) {
-            const countyData = dataMap.get(d.id);
-            if (countyData) {
-                showTooltip(event, countyData);
-            }
+           // const countyData = dataMap.get(d.id);
+         //   if (countyData) {
+          //      showTooltip(event, countyData);
+         //   }
         })
         .on('mousemove', function(event) {
-            moveTooltip(event);
+      //      moveTooltip(event);
         })
         .on('mouseout', function() {
-            hideTooltip();
+      //      hideTooltip();
         })
         .on('click', function(event, d) {
             console.log('County clicked:', d.id);
