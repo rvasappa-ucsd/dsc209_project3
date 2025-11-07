@@ -59,6 +59,9 @@ async function init() {
         // Update model info
         updateModelInfo();
         
+        // Update statistics dashboard
+        updateStatsDashboard();
+        
         console.log('Initialization complete!');
     } catch (error) {
         console.error('Initialization error:', error);
@@ -220,7 +223,18 @@ function renderVisualization() {
         .selectAll('path')
         .data(counties.features)
         .join('path')
-        .attr('class', 'county')
+        .attr('class', d => {
+            const countyData = dataMap.get(d.id);
+            let classes = 'county';
+            
+            if (countyData && state.viewMode === 'deviation') {
+                const residual = countyData.prediction.residual;
+                if (residual > 3) classes += ' extreme-over';
+                else if (residual < -3) classes += ' extreme-under';
+            }
+            
+            return classes;
+        })
         .attr('d', path)
         .attr('fill', d => {
             const fips = d.id;
@@ -253,9 +267,13 @@ function renderVisualization() {
             hideTooltip();
         })
         .on('click', function(event, d) {
+            console.log('County clicked:', d.id);
             const countyData = dataMap.get(d.id);
             if (countyData) {
+                console.log('County data found, showing modal');
                 showCountyModal(countyData);
+            } else {
+                console.log('No county data found for FIPS:', d.id);
             }
         });
     
@@ -408,13 +426,14 @@ function hideTooltip() {
  * Show detailed county modal
  */
 function showCountyModal(countyData) {
+    console.log('showCountyModal called with:', countyData.county, countyData.state);
     state.currentCountySelection = countyData;
     
     // Update modal header
     document.getElementById('modal-county-name').textContent = countyData.county;
     document.getElementById('modal-county-state').textContent = countyData.state;
     
-    // Update prediction comparison
+    // Update prediction comparison with animated bars
     const actual = countyData.prediction.actual;
     const predicted = countyData.prediction.predicted;
     const residual = countyData.prediction.residual;
@@ -433,6 +452,37 @@ function showCountyModal(countyData) {
     } else if (residual < 0) {
         deviationStat.classList.add('negative');
     }
+    
+    // Create animated prediction bars
+    const predictionBar = document.getElementById('prediction-bar');
+    const minLife = 65;
+    const maxLife = 90;
+    const range = maxLife - minLife;
+    
+    const predictedPercent = ((predicted - minLife) / range) * 100;
+    const actualPercent = ((actual - minLife) / range) * 100;
+    
+    predictionBar.innerHTML = `
+        <div style="position: relative; width: 100%; height: 60px;">
+            <div style="position: absolute; left: 0; top: 0; width: 100%; height: 30px; background: #e5e7eb; border-radius: 15px; overflow: hidden;">
+                <div class="prediction-bar-fill predicted" style="width: 0%; height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); position: relative; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);" data-width="${predictedPercent}%">
+                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85rem;">Predicted</span>
+                </div>
+            </div>
+            <div style="position: absolute; left: 0; top: 35px; width: 100%; height: 30px; background: #e5e7eb; border-radius: 15px; overflow: hidden;">
+                <div class="prediction-bar-fill actual" style="width: 0%; height: 100%; background: ${residual > 0 ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, #ef4444, #dc2626)'}; position: relative; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);" data-width="${actualPercent}%">
+                    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85rem;">Actual</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Animate bars
+    setTimeout(() => {
+        document.querySelectorAll('.prediction-bar-fill').forEach(bar => {
+            bar.style.width = bar.getAttribute('data-width');
+        });
+    }, 100);
     
     // Explanation
     const explanation = document.getElementById('deviation-explanation');
@@ -455,11 +505,20 @@ function showCountyModal(countyData) {
 }
 
 /**
- * Render metrics grid in modal
+ * Render metrics grid in modal with animated bars
  */
 function renderMetricsGrid(countyData) {
     const grid = document.getElementById('metrics-grid');
     grid.innerHTML = '';
+    
+    // Calculate national averages for comparison
+    const nationalAverages = {};
+    for (const key of Object.keys(state.metricsData)) {
+        const values = state.countiesData
+            .map(d => d.metrics[key])
+            .filter(v => v != null);
+        nationalAverages[key] = d3.mean(values);
+    }
     
     for (const [key, metricInfo] of Object.entries(state.metricsData)) {
         const value = countyData.metrics[key];
@@ -468,15 +527,36 @@ function renderMetricsGrid(countyData) {
             const card = document.createElement('div');
             card.className = 'metric-card';
             
+            const avg = nationalAverages[key];
+            const percentDiff = ((value - avg) / avg * 100).toFixed(1);
+            const isAbove = value > avg;
+            const isBetter = (key === 'life_expectancy' || key === 'median_income' || 
+                            key === 'high_school_grad' || key === 'primary_care_rate') ? isAbove : !isAbove;
+            
             card.innerHTML = `
                 <div class="metric-name">${metricInfo.name}</div>
                 <div class="metric-value">${formatValue(value, metricInfo)}</div>
+                <div class="metric-comparison ${isBetter ? 'better' : 'worse'}">
+                    ${Math.abs(percentDiff)}% ${isAbove ? 'above' : 'below'} national avg
+                </div>
+                <div class="metric-bar-bg">
+                    <div class="metric-bar ${isBetter ? 'bar-good' : 'bar-bad'}" style="width: 0%"
+                         data-width="${Math.min(Math.abs(percentDiff), 100)}%"></div>
+                </div>
                 <div class="metric-category">${metricInfo.category}</div>
             `;
             
             grid.appendChild(card);
         }
     }
+    
+    // Animate bars
+    setTimeout(() => {
+        document.querySelectorAll('.metric-bar').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            bar.style.width = width;
+        });
+    }, 100);
 }
 
 /**
@@ -570,6 +650,52 @@ function updateModelInfo() {
         document.getElementById('model-r2').innerHTML = 
             `<strong>Accuracy (R²):</strong> ${r2.toFixed(3)} (${(r2 * 100).toFixed(1)}% of variance explained)`;
     }
+}
+
+/**
+ * Update statistics dashboard
+ */
+function updateStatsDashboard() {
+    if (!state.countiesData || !state.predictionsData) return;
+    
+    const totalCounties = state.countiesData.length;
+    const overperforming = state.countiesData.filter(c => 
+        c.prediction && c.prediction.performance === 'overperforming'
+    ).length;
+    const underperforming = state.countiesData.filter(c => 
+        c.prediction && c.prediction.performance === 'underperforming'
+    ).length;
+    const r2 = state.predictionsData.r2_score;
+    
+    // Animate numbers counting up
+    animateValue('stat-total-counties', 0, totalCounties, 1000, 0);
+    animateValue('stat-overperforming', 0, overperforming, 1200, 0);
+    animateValue('stat-underperforming', 0, underperforming, 1400, 0);
+    animateValue('stat-model-accuracy', 0, r2, 1600, 3, v => v.toFixed(3));
+}
+
+/**
+ * Animate a number counter
+ */
+function animateValue(id, start, end, duration, decimals = 0, formatter = null) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    
+    const range = end - start;
+    const increment = range / (duration / 16); // 60 FPS
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
+        }
+        
+        const displayValue = formatter ? formatter(current) : 
+                           decimals > 0 ? current.toFixed(decimals) : Math.floor(current).toLocaleString();
+        element.textContent = displayValue;
+    }, 16);
 }
 
 /**

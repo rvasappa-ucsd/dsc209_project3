@@ -187,8 +187,8 @@ We tested multiple ColorBrewer palettes:
 | Team Member | Primary Responsibilities | Estimated Hours |
 |------------|-------------------------|-----------------|
 | **Harsh Arya** | Exploratory data analysis, feature engineering, Random Forest model implementation, hyperparameter tuning | 18 hours |
-| **Gabrielle Despaigne** | D3.js map implementation, TopoJSON integration, interaction handlers (hover, click, filter), debugging geographic data matching | 20 hours |
-| **Camila Paik** | UI/UX design, CSS styling, modal components, responsive layout, accessibility features, color palette testing | 16 hours |
+| **Gabrielle Despaigne** | UI/UX design, CSS styling, modal components, responsive layout, accessibility features, color palette testing | 16 hours |
+| **Camila Paik** | D3.js map implementation, TopoJSON integration, interaction handlers (hover, click, filter), debugging geographic data matching | 20 hours |
 | **Raghav Vasappanavara** | Data pipeline (CSV→JSON), documentation, testing across browsers, GitHub Pages deployment, write-up | 15 hours |
 
 **Total Effort:** ~69 person-hours over 2.5 weeks
